@@ -87,6 +87,7 @@ export const RepositoryLink = styled(Link)`
   }
 
   > div {
+    flex: 1;
     margin-left: 16px;
 
     strong {
