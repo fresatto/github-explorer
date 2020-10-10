@@ -1,45 +1,58 @@
-import React from 'react';
+import React, { useState, FormEvent } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
 
 import logoImg from '../../assets/img/logo.svg';
 import { Title, Form, Repositories, RepositoryLink } from './styles';
+import api from '../../services/api';
+
+interface Repository {
+  full_name: string;
+  description: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
+}
 
 const Dashboard: React.FC = () => {
+  const [newRepo, setNewRepo] = useState('');
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  async function handleAddRepository(evt: FormEvent) {
+    evt.preventDefault();
+
+    const { data: repository } = await api.get<Repository>(`repos/${newRepo}`);
+
+    setRepositories([...repositories, repository]);
+    setNewRepo('');
+  }
+
   return (
     <>
       <img src={logoImg} alt="Logo" />
       <Title>Explore repositórios no Github</Title>
 
-      <Form action="">
-        <input placeholder="Digite o nome do repositório" />
+      <Form onSubmit={handleAddRepository}>
+        <input
+          placeholder="Digite o nome do repositório"
+          value={newRepo}
+          onChange={(e) => setNewRepo(e.target.value)}
+        />
         <button type="submit">Pesquisar</button>
       </Form>
 
       <Repositories>
-        <RepositoryLink to="/meupai">
-          <img
-            src="https://images.pexels.com/photos/1097456/pexels-photo-1097456.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-            alt="User"
-          />
-          <div>
-            <strong>rocketseat/unform</strong>
-            <p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>
-          </div>
+        {repositories.map((repository) => (
+          <RepositoryLink key={repository.full_name} to="/meupai">
+            <img src={repository.owner.avatar_url} alt={repository.full_name} />
+            <div>
+              <strong>{repository.full_name}</strong>
+              <p>{repository.description}</p>
+            </div>
 
-          <FiChevronRight size={20} />
-        </RepositoryLink>
-        <RepositoryLink to="/meupai">
-          <img
-            src="https://images.pexels.com/photos/1097456/pexels-photo-1097456.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-            alt="User"
-          />
-          <div>
-            <strong>rocketseat/unform</strong>
-            <p>Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum</p>
-          </div>
-
-          <FiChevronRight size={20} />
-        </RepositoryLink>
+            <FiChevronRight size={20} />
+          </RepositoryLink>
+        ))}
       </Repositories>
     </>
   );
