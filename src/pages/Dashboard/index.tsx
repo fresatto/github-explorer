@@ -76,7 +76,10 @@ const Dashboard: React.FC = () => {
 
       <Repositories>
         {repositories.map((repository) => (
-          <RepositoryLink key={repository.full_name} to="/meupai">
+          <RepositoryLink
+            key={repository.full_name}
+            to={`/repository/${repository.full_name}`}
+          >
             <img src={repository.owner.avatar_url} alt={repository.full_name} />
             <div>
               <strong>{repository.full_name}</strong>
